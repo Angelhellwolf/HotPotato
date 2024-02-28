@@ -1,0 +1,4 @@
+name: HotPotato
+version: '${project.version}'
+main: com.rmc.hotpotato.HotPotato
+authors: [Angelhell]
