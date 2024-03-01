@@ -28,6 +28,7 @@ public class Game implements Listener {
     public int gameTask;
     public int startTask;
     public int runTask;
+    public int StartTime;
     private static final int MIN_PLAYERS = 3;
 
     private final List<Player> playersInGame = new ArrayList<>();
@@ -80,11 +81,27 @@ public class Game implements Listener {
         }
     }
 
+    public void timeCheck(int time){
+        if(time < 30) {
+            return;
+        }
+        if(time == 40) {
+            Bukkit.broadcastMessage("游戏将在"  + (60 - time) + "后开始");
+        }
+        if(time > 50){
+            Bukkit.broadcastMessage("游戏将在"  + (60 - time) + "后开始");
+        }
+
+    }
+
+
+
     private void handlePlayerJoinWaiting(Player player) {
         player.setDisplayName("§8[§7生土豆§8] " + player.getName());
         addPlayerToGame(player);
 
         if (playersInGame.size() >= MIN_PLAYERS) {
+            StartTime = 1;
             startCountdown();
         }
     }
@@ -98,7 +115,15 @@ public class Game implements Listener {
             startRunTask = false;
             Bukkit.broadcastMessage("§c游戏将在 60s 后开始");
             startTask = Bukkit.getScheduler().runTaskLater(plugin, this::gameStart, 1200).getTaskId();
+            int repeatTask = Bukkit.getScheduler().runTaskTimer(plugin, this::startCountdownTime, 20, 20).getTaskId(); // 20 ticks = 1 second
+            Bukkit.getScheduler().runTaskLater(plugin, () -> Bukkit.getScheduler().cancelTask(repeatTask), 1200);
         }
+
+    }
+    public void startCountdownTime() {
+        timeCheck(StartTime);
+        StartTime++;
+
     }
 
     @EventHandler
@@ -140,6 +165,7 @@ public class Game implements Listener {
         // 在这里执行取消倒计时的逻辑，如清除倒计时任务等
         Bukkit.broadcastMessage("§c玩家不足，倒计时已取消");
         Bukkit.getScheduler().cancelTask(startTask);
+        StartTime = 0;
     }
 
     private void gameStart() {
